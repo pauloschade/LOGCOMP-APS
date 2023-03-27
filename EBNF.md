@@ -1,8 +1,4 @@
-# EZFIN DSL
-
-## EBNF
-
-------------------------------
+# EBNF
 
 **PROGRAM** = { STATEMENT } ;
 
