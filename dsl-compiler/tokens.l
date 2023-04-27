@@ -1,7 +1,7 @@
 %{
 #include <string>
-#include "node.h"
-#include "parser.hpp"
+// #include "node.h"
+// #include "parser.hpp"
 #define SAVE_TOKEN yylval.string = new std::string(yytext, yyleng)
 #define TOKEN(t) (yylval.token = t)
 extern "C" int yywrap() { }
@@ -10,7 +10,6 @@ extern "C" int yywrap() { }
 %%
 
 [ \t\n]                 ;
-[a-zA-Z][a-zA-Z0-9_]*         SAVE_TOKEN; return TIDENTIFIER;
 [0-9]+                        SAVE_TOKEN; return TINTEGER;
 "="                           return TOKEN(TEQUAL);
 "=="                          return TOKEN(TCEQ);
@@ -32,14 +31,13 @@ extern "C" int yywrap() { }
 "if"                          return TOKEN(TIF);
 "else"                        return TOKEN(TELSE);
 "function"                    return TOKEN(TFUNC);
-
-//DSL
-[_][a-zA-Z0-9_]+              SAVE_TOKEN; return TPERSONIDENTIFIER;
 "create"                      return TOKEN(TCREATE);
 "delete"                      return TOKEN(TDELETE);
 "withdraw"                    return TOKEN(TWITHDRAR);
 "transfer"                    return TOKEN(TTRANSFER);
 "balance"                     return TOKEN(TBALANCE);
+[_][a-zA-Z0-9_]+              SAVE_TOKEN; return TPERSONIDENTIFIER;
+[a-zA-Z][a-zA-Z0-9_]*         SAVE_TOKEN; return TIDENTIFIER;
 .                             printf("Unknown token!n"); yyterminate();
 
 %%
