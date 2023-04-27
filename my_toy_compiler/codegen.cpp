@@ -208,3 +208,13 @@ Value* NFunctionDeclaration::codeGen(CodeGenContext& context)
 	std::cout << "Creating function: " << id.name << endl;
 	return function;
 }
+
+////////////////////////////////////////////////////////////
+Value* NPrintStatement::codeGen(CodeGenContext& context)
+{
+	std::cout << "Generating print code for " << typeid(expression).name() << endl;
+	Value *printValue = expression.codeGen(context);
+	context.setCurrentReturnValue(printValue);
+	std::cout << "print value: " <<  printValue << endl;
+	return printValue;
+}

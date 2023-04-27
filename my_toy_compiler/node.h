@@ -130,3 +130,13 @@ public:
 		type(type), id(id), arguments(arguments), block(block) { }
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
+
+///////////////////////////////////////////////////
+
+class NPrintStatement : public NStatement {
+public:
+	NExpression& expression;
+	NPrintStatement(NExpression& expression) : 
+		expression(expression) { }
+	virtual llvm::Value* codeGen(CodeGenContext& context);
+};
