@@ -1,7 +1,7 @@
 %{
 	#include "node.h"
-        #include <cstdio>
-        #include <cstdlib>
+	#include <cstdio>
+	#include <cstdlib>
 	NBlock *programBlock; /* the top level root node of our final AST */
 
 	extern int yylex();
@@ -14,7 +14,7 @@
 	NBlock *block;
 	NExpression *expr;
 	NStatement *stmt;
-	NIdentifier *ident;
+	NIdentifier *ident *pident;
 	NVariableDeclaration *var_decl;
 	std::vector<NVariableDeclaration*> *varvec;
 	std::vector<NExpression*> *exprvec;
@@ -42,8 +42,8 @@
 %type <varvec> func_decl_args
 %type <exprvec> call_args
 %type <block> program stmts block
-%type <stmt> stmt var_decl func_decl extern_decl
-%type <token> comparison
+%type <stmt> stmt var_decl func_decl extern_decl dsl_stmt
+%type <token> comparison dsl_mov
 
 /* Operator precedence for mathematical operators */
 %left TPLUS TMINUS
@@ -98,12 +98,12 @@ expr : ident TEQUAL expr { $$ = new NAssignment(*$<ident>1, *$3); }
 	 | ident TLPAREN call_args TRPAREN { $$ = new NMethodCall(*$1, *$3); delete $3; }
 	 | ident { $<ident>$ = $1; }
 	 | numeric
-         | expr TMUL expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
-         | expr TDIV expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
-         | expr TPLUS expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
-         | expr TMINUS expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
- 	 | expr comparison expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
-     | TLPAREN expr TRPAREN { $$ = $2; }
+	 | expr TMUL expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
+	 | expr TDIV expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
+	 | expr TPLUS expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
+	 | expr TMINUS expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
+	 | expr comparison expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
+   | TLPAREN expr TRPAREN { $$ = $2; }
 	 ;
 	
 call_args : /*blank*/  { $$ = new ExpressionList(); }
@@ -112,5 +112,14 @@ call_args : /*blank*/  { $$ = new ExpressionList(); }
 		  ;
 
 comparison : TCEQ | TCNE | TCLT | TCLE | TCGT | TCGE;
+
+DSL
+dsl_stmt : dsl_mov pident INTEGER { $$ = new NDSLMovementStatement($1, $2, $3); }
+				 | T_CREATE pident INTEGER { $$ = new NDSLCreationStatement($2, $3); }
+				 ;
+
+dsl_mov : T_DEPOSIT | T_WITHDRAW;
+
+pident : TUNDERSCORE ident;
 
 %%

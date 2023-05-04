@@ -140,3 +140,23 @@ public:
 		expression(expression) { }
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
+
+
+/////////////////////////////////////////////////// DSL /////////////////////////////////////////////////
+
+class NDSLMovementStatement : public NExpression {
+public:
+	int op;
+	NIdentifier& person;
+	NInteger& amount;
+	NDSLMovementStatement(int op, NIdentifier& person, NInteger& amount) :
+		op(op), person(person), amount(amount) { }
+};
+
+class NDSLCreationStatement : public NExpression {
+public:
+	NIdentifier& person;
+	NInteger& amount;
+	NDSLMovementStatement(int op, NIdentifier& person, NInteger& amount) : 
+	person(person), amount(amount) { }
+};

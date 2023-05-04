@@ -214,7 +214,28 @@ Value* NPrintStatement::codeGen(CodeGenContext& context)
 {
 	std::cout << "Generating print code for " << typeid(expression).name() << endl;
 	Value *printValue = expression.codeGen(context);
-	context.setCurrentReturnValue(printValue);
-	std::cout << "print value: " <<  printValue << endl;
+	//cout result from printValue
+	
 	return printValue;
+}
+
+
+/////////////////////////////////////////////////// DSL /////////////////////////////////////////////////
+
+// Value* NDSLMovementStatement ::codeGen(CodeGenContext& context) {
+// 	std::cout << "Generating DSL code for " << typeid(person).name() << endl;
+// 	if (context.locals().find(person.name) == context.locals().end()) {
+// 		std::cerr << "undeclared person " << lhs.name << endl;
+// 		return NULL;
+// 	}
+// 	return new StoreInst(amount.codeGen(context), context.locals()[person.name], false, context.currentBlock());
+// };
+
+
+Value* NDSLCreationStatement::codeGen(CodeGenContext& context)
+{
+	std::cout << "Creating person declaration " << person.name << endl;
+	AllocaInst *alloc = new AllocaInst(typeOf("int") ,4, amount.value.c_str(), context.currentBlock());
+	context.locals()[person.name] = alloc;
+	return alloc;
 }
