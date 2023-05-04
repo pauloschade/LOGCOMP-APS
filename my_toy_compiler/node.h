@@ -144,19 +144,19 @@ public:
 
 /////////////////////////////////////////////////// DSL /////////////////////////////////////////////////
 
-class NDSLMovementStatement : public NExpression {
+class NDSLMovementStatement : public NStatement {
 public:
 	int op;
 	NIdentifier& person;
-	NInteger& amount;
-	NDSLMovementStatement(int op, NIdentifier& person, NInteger& amount) :
-		op(op), person(person), amount(amount) { }
+	NExpression& exp;
+	NDSLMovementStatement(int op, NIdentifier& person, NExpression& exp) :
+		op(op), person(person), exp(exp) { }
 };
 
-class NDSLCreationStatement : public NExpression {
+class NDSLCreationStatement : public NStatement {
 public:
 	NIdentifier& person;
-	NInteger& amount;
-	NDSLMovementStatement(int op, NIdentifier& person, NInteger& amount) : 
-	person(person), amount(amount) { }
+	NExpression& exp;
+	NDSLCreationStatement(NIdentifier& person, NExpression& exp) : 
+	person(person), exp(exp) { }
 };

@@ -14,7 +14,7 @@
 	NBlock *block;
 	NExpression *expr;
 	NStatement *stmt;
-	NIdentifier *ident *pident;
+	NIdentifier *ident;
 	NVariableDeclaration *var_decl;
 	std::vector<NVariableDeclaration*> *varvec;
 	std::vector<NExpression*> *exprvec;
@@ -28,9 +28,10 @@
  */
 %token <string> TIDENTIFIER TINTEGER TDOUBLE
 %token <token> TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL
-%token <token> TLPAREN TRPAREN TLBRACE TRBRACE TCOMMA TDOT
+%token <token> TLPAREN TRPAREN TLBRACE TRBRACE TCOMMA TDOT TUNDERSCORE
 %token <token> TPLUS TMINUS TMUL TDIV
 %token <token> TPRINT TRETURN TEXTERN
+%token <token> TCREATE TDEPOSIT TWITHDRAW
 
 /* Define the type of node our nonterminal symbols represent.
    The types refer to the %union declaration above. Ex: when
@@ -42,7 +43,7 @@
 %type <varvec> func_decl_args
 %type <exprvec> call_args
 %type <block> program stmts block
-%type <stmt> stmt var_decl func_decl extern_decl dsl_stmt
+%type <stmt> stmt var_decl func_decl dsl_stmt extern_decl
 %type <token> comparison dsl_mov
 
 /* Operator precedence for mathematical operators */
@@ -60,7 +61,7 @@ stmts : stmt { $$ = new NBlock(); $$->statements.push_back($<stmt>1); }
 	  | stmts stmt { $1->statements.push_back($<stmt>2); }
 	  ;
 
-stmt : var_decl | func_decl | extern_decl
+stmt : var_decl | func_decl | extern_decl | dsl_stmt
 	 | expr { $$ = new NExpressionStatement(*$1); }
 	 | TRETURN expr { $$ = new NReturnStatement(*$2); }
 	 | TPRINT TLPAREN expr TRPAREN {$$ = new NPrintStatement(*$3); }
@@ -113,12 +114,10 @@ call_args : /*blank*/  { $$ = new ExpressionList(); }
 
 comparison : TCEQ | TCNE | TCLT | TCLE | TCGT | TCGE;
 
-DSL
-dsl_stmt : dsl_mov pident INTEGER { $$ = new NDSLMovementStatement($1, $2, $3); }
-				 | T_CREATE pident INTEGER { $$ = new NDSLCreationStatement($2, $3); }
-				 ;
+dsl_stmt : TCREATE ident expr { $$ = new NDSLCreationStatement(*$2, *$3); }
+		 ;
 
-dsl_mov : T_DEPOSIT | T_WITHDRAW;
+dsl_mov : TDEPOSIT | TWITHDRAW;
 
 pident : TUNDERSCORE ident;
 
