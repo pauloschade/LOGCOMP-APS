@@ -31,7 +31,7 @@
 %token <token> TLPAREN TRPAREN TLBRACE TRBRACE TCOMMA TDOT TUNDERSCORE
 %token <token> TPLUS TMINUS TMUL TDIV
 %token <token> TPRINT TRETURN TEXTERN
-%token <token> TCREATE TDEPOSIT TWITHDRAW
+%token <token> TCREATE TDEPOSIT TWITHDRAW TTRANSFER TBALANCE
 
 /* Define the type of node our nonterminal symbols represent.
    The types refer to the %union declaration above. Ex: when
@@ -114,11 +114,9 @@ call_args : /*blank*/  { $$ = new ExpressionList(); }
 
 comparison : TCEQ | TCNE | TCLT | TCLE | TCGT | TCGE;
 
-dsl_stmt : TCREATE ident expr { $$ = new NDSLCreationStatement(*$2, *$3); }
+dsl_stmt : TCREATE TUNDERSCORE ident expr { $$ = new NDSLCreationStatement(*$3, *$4); }
 		 ;
 
 dsl_mov : TDEPOSIT | TWITHDRAW;
-
-pident : TUNDERSCORE ident;
 
 %%

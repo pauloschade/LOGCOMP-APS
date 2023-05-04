@@ -235,7 +235,9 @@ Value* NPrintStatement::codeGen(CodeGenContext& context)
 Value* NDSLCreationStatement::codeGen(CodeGenContext& context)
 {
 	std::cout << "Creating person declaration " << person.name << endl;
-	AllocaInst *alloc = new AllocaInst(typeOf("int") ,4, amount.value.c_str(), context.currentBlock());
+	AllocaInst *alloc = new AllocaInst(Type::getInt64Ty(MyContext),4, person.name.c_str(), context.currentBlock());
 	context.locals()[person.name] = alloc;
+	NAssignment assn(person, exp);
+	assn.codeGen(context);
 	return alloc;
 }

@@ -151,6 +151,7 @@ public:
 	NExpression& exp;
 	NDSLMovementStatement(int op, NIdentifier& person, NExpression& exp) :
 		op(op), person(person), exp(exp) { }
+	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
 class NDSLCreationStatement : public NStatement {
@@ -159,4 +160,5 @@ public:
 	NExpression& exp;
 	NDSLCreationStatement(NIdentifier& person, NExpression& exp) : 
 	person(person), exp(exp) { }
+	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
