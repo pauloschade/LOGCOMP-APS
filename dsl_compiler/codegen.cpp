@@ -235,6 +235,10 @@ Value* NDSLCreationStatement::codeGen(CodeGenContext& context)
 //create movement statement
 Value* NDSLMovementStatement::codeGen(CodeGenContext& context)
 {
+	
+	if(!checkVar(person.name)) {
+		return NULL;
+	}
 	std::cout << "Creating movement statement " << endl;
 	//get the value of the person
 	Value *personValue = context.locals()[person.name];
@@ -265,6 +269,10 @@ Value* NDSLMovementStatement::codeGen(CodeGenContext& context)
 Value* NDSLTransferStatement::codeGen(CodeGenContext& context)
 {
 	std::cout << "Creating transfer statement " << endl;
+
+	if(!checkVar(expender.name) || !checkVar(receiver.name)) {
+		return NULL;
+	}
 	//get the value of the expender
 	Value *expenderValue = context.locals()[expender.name];
 	//get the value of the amount
@@ -287,4 +295,11 @@ Value* NDSLTransferStatement::codeGen(CodeGenContext& context)
 	return expenderValue;
 }
 
+bool checkVar(string name) {
+	if (context.locals().find(name) == context.locals().end()) {
+		std::cerr << "undeclared person " << name << endl;
+		return false;
+	}
+	return true;
+}
 
