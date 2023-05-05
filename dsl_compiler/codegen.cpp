@@ -236,9 +236,11 @@ Value* NDSLCreationStatement::codeGen(CodeGenContext& context)
 Value* NDSLMovementStatement::codeGen(CodeGenContext& context)
 {
 
-	if(!checkVar(person.name, context)) {
+	if (context.locals().find(person.name) == context.locals().end()) {
+		std::cerr << "undeclared person " << person.name << endl;
 		return NULL;
 	}
+
 	std::cout << "Creating movement statement " << endl;
 	//get the value of the person
 	Value *personValue = context.locals()[person.name];
@@ -270,7 +272,13 @@ Value* NDSLTransferStatement::codeGen(CodeGenContext& context)
 {
 	std::cout << "Creating transfer statement " << endl;
 
-	if(!checkVar(expender.name, context) || !checkVar(receiver.name, context)) {
+	if (context.locals().find(expender.name) == context.locals().end()) {
+		std::cerr << "undeclared person " << expender.name << endl;
+		return NULL;
+	}
+
+	if (context.locals().find(receiver.name) == context.locals().end()) {
+		std::cerr << "undeclared person " << receiver.name << endl;
 		return NULL;
 	}
 	//get the value of the expender
@@ -293,13 +301,5 @@ Value* NDSLTransferStatement::codeGen(CodeGenContext& context)
 	StoreInst *inst2 = new StoreInst(newReceiverBalanceValue, context.locals()[receiver.name], false, context.currentBlock());
 
 	return expenderValue;
-}
-
-bool checkVar(string name, CodeGenContext& context) {
-	if (context.locals().find(name) == context.locals().end()) {
-		std::cerr << "undeclared person " << name << endl;
-		return false;
-	}
-	return true;
 }
 
