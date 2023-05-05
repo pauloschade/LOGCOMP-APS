@@ -1,0 +1,3 @@
+create _paulo (10 + 10 + 20 * 2)
+create _mat 100
+transfer _mat to _paulo 20

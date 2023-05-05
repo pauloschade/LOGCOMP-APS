@@ -243,6 +243,7 @@ Value* NDSLMovementStatement::codeGen(CodeGenContext& context)
 	//get the value of the person's balance
 	Value *personBalanceValue = new LoadInst(context.locals()[person.name]->getType(),context.locals()[person.name], person.name, false, context.currentBlock());
 	//get the value of the person's balance + amount
+	Instruction::BinaryOps instr;
 	switch (op)
 	{
 	case TDEPOSIT:
@@ -275,7 +276,7 @@ Value* NDSLTransferStatement::codeGen(CodeGenContext& context)
 	//get the value of the expender's balance
 	Value *expenderBalanceValue = new LoadInst(context.locals()[expender.name]->getType(),context.locals()[expender.name], expender.name, false, context.currentBlock());
 	//get the value of the expender's balance - amount
-	Value *newexpenderBalanceValue = BinaryOperator::Create(Instruction::Sub, expenderBalanceValue, amountValue, "", context.currentBlock());
+	Value *newExpenderBalanceValue = BinaryOperator::Create(Instruction::Sub, expenderBalanceValue, amountValue, "", context.currentBlock());
 	//get the value of the receiver's balance + amount
 	Value *newReceiverBalanceValue = BinaryOperator::Create(Instruction::Add, receiverBalanceValue, amountValue, "", context.currentBlock());
 	//store the new expender balance
