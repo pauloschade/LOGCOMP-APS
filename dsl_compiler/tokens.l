@@ -20,6 +20,10 @@
 "transfer"              return TOKEN(TTRANSFER);
 "withdraw"              return TOKEN(TWITHDRAW);
 "balance"               return TOKEN(TBALANCE);
+"if"                    return TOKEN(TIF);
+"else"                  return TOKEN(TELSE);
+"loop"                  return TOKEN(TLOOP);
+"to"                    return TOKEN(TTO);
 [a-zA-Z][a-zA-Z0-9_]*   SAVE_TOKEN; return TIDENTIFIER;
 [0-9]+\.[0-9]* 			    SAVE_TOKEN; return TDOUBLE;
 [0-9]+					        SAVE_TOKEN; return TINTEGER;

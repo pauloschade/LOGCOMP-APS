@@ -141,6 +141,26 @@ public:
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
+//create if statement
+class NIfStatement : public NStatement {
+public:
+	NExpression& expression;
+	NBlock& block;
+	NIfStatement(NExpression& expression, NBlock& block) : 
+		expression(expression), block(block) { }
+	virtual llvm::Value* codeGen(CodeGenContext& context);
+};
+
+//create Loop statement
+class NLoopStatement : public NStatement {
+public:
+	NExpression& expression;
+	NBlock& block;
+	NLoopStatement(NExpression& expression, NBlock& block) : 
+		expression(expression), block(block) { }
+	virtual llvm::Value* codeGen(CodeGenContext& context);
+};
+
 
 /////////////////////////////////////////////////// DSL /////////////////////////////////////////////////
 
@@ -160,5 +180,23 @@ public:
 	NExpression& exp;
 	NDSLCreationStatement(NIdentifier& person, NExpression& exp) : 
 	person(person), exp(exp) { }
+	virtual llvm::Value* codeGen(CodeGenContext& context);
+};
+
+// class NDSLDeletionStatement : public NStatement {
+// public:
+// 	NIdentifier& person;
+// 	NDSLDeletionStatement(NIdentifier& person) : 
+// 	person(person) { }
+// 	virtual llvm::Value* codeGen(CodeGenContext& context);
+// };
+
+class NDSLTransferStatement : public NStatement {
+public:
+	NIdentifier& expender;
+	NIdentifier& receiver;
+	NExpression& exp;
+	NDSLTransferStatement(NIdentifier& expender, NIdentifier& receiver, NExpression& exp) : 
+	expender(expender), receiver(receiver), exp(exp) { }
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };

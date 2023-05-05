@@ -222,16 +222,6 @@ Value* NPrintStatement::codeGen(CodeGenContext& context)
 
 /////////////////////////////////////////////////// DSL /////////////////////////////////////////////////
 
-// Value* NDSLMovementStatement ::codeGen(CodeGenContext& context) {
-// 	std::cout << "Generating DSL code for " << typeid(person).name() << endl;
-// 	if (context.locals().find(person.name) == context.locals().end()) {
-// 		std::cerr << "undeclared person " << lhs.name << endl;
-// 		return NULL;
-// 	}
-// 	return new StoreInst(amount.codeGen(context), context.locals()[person.name], false, context.currentBlock());
-// };
-
-
 Value* NDSLCreationStatement::codeGen(CodeGenContext& context)
 {
 	std::cout << "Creating person declaration " << person.name << endl;
@@ -241,3 +231,59 @@ Value* NDSLCreationStatement::codeGen(CodeGenContext& context)
 	assn.codeGen(context);
 	return alloc;
 }
+
+//create movement statement
+Value* NDSLMovementStatement::codeGen(CodeGenContext& context)
+{
+	std::cout << "Creating movement statement " << endl;
+	//get the value of the person
+	Value *personValue = context.locals()[person.name];
+	//get the value of the amount
+	Value *amountValue = exp.codeGen(context);
+	//get the value of the person's balance
+	Value *personBalanceValue = new LoadInst(context.locals()[person.name]->getType(),context.locals()[person.name], person.name, false, context.currentBlock());
+	//get the value of the person's balance + amount
+	switch (op)
+	{
+	case TDEPOSIT:
+    instr = Instruction::Add;
+		break;
+	case TWITHDRAW:
+		instr = Instruction::Sub;
+	default:
+	  return NULL;
+	}
+	Value *newBalanceValue = BinaryOperator::Create(instr, personBalanceValue, amountValue, "", context.currentBlock());
+	//store the new balance
+	StoreInst *inst = new StoreInst(newBalanceValue, context.locals()[person.name], false, context.currentBlock());
+
+	return personValue;
+}
+
+//create transfer statement
+Value* NDSLTransferStatement::codeGen(CodeGenContext& context)
+{
+	std::cout << "Creating transfer statement " << endl;
+	//get the value of the expender
+	Value *expenderValue = context.locals()[expender.name];
+	//get the value of the amount
+	Value *amountValue = exp.codeGen(context);
+	//get the value of the receiver
+	Value *receiverValue = context.locals()[receiver.name];
+	//get the value of the receiver's balance
+	Value *receiverBalanceValue = new LoadInst(context.locals()[receiver.name]->getType(),context.locals()[receiver.name], receiver.name, false, context.currentBlock());
+	//get the value of the expender's balance
+	Value *expenderBalanceValue = new LoadInst(context.locals()[expender.name]->getType(),context.locals()[expender.name], expender.name, false, context.currentBlock());
+	//get the value of the expender's balance - amount
+	Value *newexpenderBalanceValue = BinaryOperator::Create(Instruction::Sub, expenderBalanceValue, amountValue, "", context.currentBlock());
+	//get the value of the receiver's balance + amount
+	Value *newReceiverBalanceValue = BinaryOperator::Create(Instruction::Add, receiverBalanceValue, amountValue, "", context.currentBlock());
+	//store the new expender balance
+	StoreInst *inst = new StoreInst(newExpenderBalanceValue, context.locals()[expender.name], false, context.currentBlock());
+	//store the new receiver balance
+	StoreInst *inst2 = new StoreInst(newReceiverBalanceValue, context.locals()[receiver.name], false, context.currentBlock());
+
+	return expenderValue;
+}
+
+
