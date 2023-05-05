@@ -235,8 +235,8 @@ Value* NDSLCreationStatement::codeGen(CodeGenContext& context)
 //create movement statement
 Value* NDSLMovementStatement::codeGen(CodeGenContext& context)
 {
-	
-	if(!checkVar(person.name)) {
+
+	if(!checkVar(person.name, context)) {
 		return NULL;
 	}
 	std::cout << "Creating movement statement " << endl;
@@ -270,7 +270,7 @@ Value* NDSLTransferStatement::codeGen(CodeGenContext& context)
 {
 	std::cout << "Creating transfer statement " << endl;
 
-	if(!checkVar(expender.name) || !checkVar(receiver.name)) {
+	if(!checkVar(expender.name, context) || !checkVar(receiver.name, context)) {
 		return NULL;
 	}
 	//get the value of the expender
@@ -295,7 +295,7 @@ Value* NDSLTransferStatement::codeGen(CodeGenContext& context)
 	return expenderValue;
 }
 
-bool checkVar(string name) {
+bool checkVar(string name, CodeGenContext& context) {
 	if (context.locals().find(name) == context.locals().end()) {
 		std::cerr << "undeclared person " << name << endl;
 		return false;
