@@ -32,7 +32,7 @@
 %token <token> TPLUS TMINUS TMUL TDIV
 %token <token> TPRINT TRETURN TEXTERN
 %token <token> TCREATE TDEPOSIT TWITHDRAW TTRANSFER TBALANCE TTO
-%token <token> TIF TELSE TLOOP
+%token <token> TIF TELSE TLOOP TTHEN
 
 /* Define the type of node our nonterminal symbols represent.
    The types refer to the %union declaration above. Ex: when
@@ -66,6 +66,9 @@ stmt : var_decl | func_decl | extern_decl | dsl_stmt
 	 | expr { $$ = new NExpressionStatement(*$1); }
 	 | TRETURN expr { $$ = new NReturnStatement(*$2); }
 	 | TPRINT TLPAREN expr TRPAREN {$$ = new NPrintStatement(*$3); }
+	 | TIF TLPAREN expr TRPAREN TTHEN block { $$ = new NIfStatement(*$3, *$5); }
+	 | TIF TLPAREN expr TRPAREN TTHEN block TELSE block { $$ = new NIfStatement(*$3, *$5, *$7); }
+	 | TLOOP block { $$ = new NLoopStatement(*$2); }
      ;
 
 block : TLBRACE stmts TRBRACE { $$ = $2; }

@@ -210,14 +210,47 @@ Value* NFunctionDeclaration::codeGen(CodeGenContext& context)
 }
 
 ////////////////////////////////////////////////////////////
-Value* NPrintStatement::codeGen(CodeGenContext& context)
+
+//create if statement
+Value* NIfStatement::codeGen(CodeGenContext& context)
 {
-	std::cout << "Generating print code for " << typeid(expression).name() << endl;
-	Value *printValue = expression.codeGen(context);
-	//cout result from printValue
-	
-	return printValue;
+	std::cout << "Creating if statement" << endl;
+	Value *condValue = condition.codeGen(context);
+	if (condValue == NULL) return NULL;
+	condValue = new ICmpInst(*context.currentBlock(), ICmpInst::ICMP_NE, condValue, ConstantInt::get(Type::getInt64Ty(MyContext), 0, true), "ifcond");
+	Function *function = context.currentBlock()->getParent();
+	BasicBlock *thenBlock = BasicBlock::Create(MyContext, "then", function);
+	BasicBlock *elseBlock = BasicBlock::Create(MyContext, "else");
+	BasicBlock *mergeBlock = BasicBlock::Create(MyContext, "ifcont");
+	BranchInst::Create(thenBlock, elseBlock, condValue, context.currentBlock());
+	context.pushBlock(thenBlock);
+	Value *thenValue = thenBlock->getTerminator();
+	if (thenValue == NULL) {
+		thenValue = thenBlock->getTerminator();
+	}
+	context.popBlock();
+	if (thenValue == NULL) {
+		thenValue = BranchInst::Create(mergeBlock, thenBlock);
+	}
+	function->getBasicBlockList().push_back(elseBlock);
+	context.pushBlock(elseBlock);
+	Value *elseValue = elseBlock->getTerminator();
+	if (elseValue == NULL) {
+		elseValue = elseBlock->getTerminator();
+	}
+	context.popBlock();
+	if (elseValue == NULL) {
+		elseValue = BranchInst::Create(mergeBlock, elseBlock);
+	}
+	function->getBasicBlockList().push_back(mergeBlock);
+	context.pushBlock(mergeBlock);
+	PHINode *phiNode = PHINode::Create(Type::getInt64Ty(MyContext), 2, "", mergeBlock);
+	phiNode->addIncoming(thenValue, thenBlock);
+	phiNode->addIncoming(elseValue, elseBlock);
+	return phiNode;
 }
+
+//create while statement
 
 
 /////////////////////////////////////////////////// DSL /////////////////////////////////////////////////

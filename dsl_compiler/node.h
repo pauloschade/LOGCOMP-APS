@@ -146,8 +146,11 @@ class NIfStatement : public NStatement {
 public:
 	NExpression& expression;
 	NBlock& block;
+	NBlock& elseBlock;
 	NIfStatement(NExpression& expression, NBlock& block) : 
 		expression(expression), block(block) { }
+	NIfStatement(NExpression& expression, NBlock& block, NBlock& elseBlock) :
+		expression(expression), block(block), elseBlock(elseBlock) { }
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
@@ -182,15 +185,6 @@ public:
 	person(person), exp(exp) { }
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
-
-// class NDSLDeletionStatement : public NStatement {
-// public:
-// 	NIdentifier& person;
-// 	NDSLDeletionStatement(NIdentifier& person) : 
-// 	person(person) { }
-// 	virtual llvm::Value* codeGen(CodeGenContext& context);
-// };
-
 class NDSLTransferStatement : public NStatement {
 public:
 	NIdentifier& expender;
