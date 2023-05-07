@@ -25,6 +25,7 @@
 "loop"                  return TOKEN(TLOOP);
 "to"                    return TOKEN(TTO);
 "then"                  return TOKEN(TTHEN);
+"end"                  return TOKEN(TEND);
 [a-zA-Z][a-zA-Z0-9_]*   SAVE_TOKEN; return TIDENTIFIER;
 [0-9]+\.[0-9]* 			    SAVE_TOKEN; return TDOUBLE;
 [0-9]+					        SAVE_TOKEN; return TINTEGER;

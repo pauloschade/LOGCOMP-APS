@@ -268,7 +268,7 @@ Value* NLoopStatement::codeGen(CodeGenContext& context)
 	condValue = new ICmpInst(*context.currentBlock(), ICmpInst::ICMP_NE, condValue, ConstantInt::get(Type::getInt64Ty(MyContext), 0, true), "loopcond");
 	BranchInst::Create(loopBlock, afterBlock, condValue, preheaderBlock);
 	context.pushBlock(loopBlock);
-	Value *bodyValue = body.codeGen(context);
+	Value *bodyValue = block.codeGen(context);
 	if (bodyValue == NULL) return NULL;
 	BranchInst::Create(loopBlock, context.currentBlock());
 	context.popBlock();

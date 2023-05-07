@@ -1,5 +1,0 @@
-bint do_math(int a) { 
-    int x = a * 5 + 3 
-    log(x)
-} 
-do_math(10)
