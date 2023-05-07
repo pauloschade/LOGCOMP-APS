@@ -56,6 +56,12 @@ static Type *typeOf(const NIdentifier& type)
 	return Type::getVoidTy(MyContext);
 }
 
+//create loop statement
+static Value* LogErrorV(const char *str) {
+		fprintf(stderr, "Error: %s\n", str);
+		return NULL;
+}
+
 /* -- Code Generation -- */
 
 Value* NInteger::codeGen(CodeGenContext& context)
@@ -250,9 +256,40 @@ Value* NIfStatement::codeGen(CodeGenContext& context)
 	return phiNode;
 }
 
-//create while statement
+Value* NLoopStatement::codeGen(CodeGenContext& context)
+{
+	std::cout << "Creating loop statement" << endl;
+	Function *function = context.currentBlock()->getParent();
+	BasicBlock *preheaderBlock = context.currentBlock();
+	BasicBlock *loopBlock = BasicBlock::Create(MyContext, "loop", function);
+	BasicBlock *afterBlock = BasicBlock::Create(MyContext, "afterloop", function);
+	Value *condValue = condition.codeGen(context);
+	if (condValue == NULL) return NULL;
+	condValue = new ICmpInst(*context.currentBlock(), ICmpInst::ICMP_NE, condValue, ConstantInt::get(Type::getInt64Ty(MyContext), 0, true), "loopcond");
+	BranchInst::Create(loopBlock, afterBlock, condValue, preheaderBlock);
+	context.pushBlock(loopBlock);
+	Value *bodyValue = body.codeGen(context);
+	if (bodyValue == NULL) return NULL;
+	BranchInst::Create(loopBlock, context.currentBlock());
+	context.popBlock();
+	context.pushBlock(afterBlock);
+	return Constant::getNullValue(Type::getInt64Ty(MyContext));
+}
 
-
+//create print statement
+Value* NPrintStatement::codeGen(CodeGenContext& context)
+{
+	std::cout << "Creating print statement" << endl;
+	Function *function = context.module->getFunction("printf");
+	if (function == NULL) {
+		return LogErrorV("no printf function found");
+	}
+	std::vector<Value*> args;
+	args.push_back(ConstantPointerNull::get(Type::getInt8PtrTy(MyContext)));
+	args.push_back(expression.codeGen(context));
+	CallInst *call = CallInst::Create(function, makeArrayRef(args), "", context.currentBlock());
+	return call;
+}
 
 /////////////////////////////////////////////////// DSL /////////////////////////////////////////////////
 
