@@ -144,23 +144,23 @@ public:
 //create if statement
 class NIfStatement : public NStatement {
 public:
-	NExpression& expression;
+	NExpression& condition;
 	NBlock& block;
-	NBlock& elseBlock;
-	NIfStatement(NExpression& expression, NBlock& block) : 
-		expression(expression), block(block) { }
-	NIfStatement(NExpression& expression, NBlock& block, NBlock& elseBlock) :
-		expression(expression), block(block), elseBlock(elseBlock) { }
+	NBlock *elseBlock;
+	NIfStatement(NExpression& condition, NBlock& block) : 
+		condition(condition), block(block) { elseBlock = NULL; }
+	NIfStatement(NExpression& condition, NBlock& block, NBlock *elseBlock) :
+		condition(condition), block(block), elseBlock(elseBlock) { }
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
 //create Loop statement
 class NLoopStatement : public NStatement {
 public:
-	NExpression& expression;
+	NExpression& condition;
 	NBlock& block;
-	NLoopStatement(NExpression& expression, NBlock& block) : 
-		expression(expression), block(block) { }
+	NLoopStatement(NExpression& condition, NBlock& block) : 
+		condition(condition), block(block) { }
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
