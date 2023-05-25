@@ -244,120 +244,60 @@ Value* NFunctionDeclaration::codeGen(CodeGenContext& context)
 ////////////////////////////////////////////////////////////
 
 //create if statement
-// llvm::Value* NIfStatement::codeGen(CodeGenContext& context) {
-//     // Generate code for the condition expression
-//     llvm::Value* conditionValue = condition.codeGen(context);
-
-//     // Convert the condition value to a boolean
-//     llvm::Value* conditionBool = context.llvmContext->CreateIntCast(
-//         conditionValue, llvm::Type::getInt1Ty(*context.llvmContext), true);
-
-//     // Create basic blocks for the if statement
-//     llvm::Function* function = context.currentBlock()->getParent();
-//     llvm::BasicBlock* ifBlock = llvm::BasicBlock::Create(*context.llvmContext, "if", function);
-//     llvm::BasicBlock* mergeBlock = llvm::BasicBlock::Create(*context.llvmContext, "ifcont");
-
-//     // Branch based on the condition
-//     llvm::IRBuilder<> builder(context.currentBlock());
-//     builder.CreateCondBr(conditionBool, ifBlock, mergeBlock);
-
-//     // Generate code for the if block
-//     builder.SetInsertPoint(ifBlock);
-//     context.pushBlock(ifBlock);
-//     block.codeGen(context);
-//     context.popBlock();
-//     builder.CreateBr(mergeBlock);
-
-//     // Set the insert point to the merge block
-//     function->getBasicBlockList().push_back(mergeBlock);
-//     builder.SetInsertPoint(mergeBlock);
-
-//     return nullptr; // Return null for the codeGen() method
-// }
-
-Value* NIfStatement::codeGen(CodeGenContext& context) {
-	llvm::IRBuilder<> builder(context.currentBlock());
-	cout << "Generating if statement" << endl;
-
-	Value* condValue = condition.codeGen(context);
-	if (!condValue) {
-		std::cout<< "No condValue" <<std::endl;
+llvm::Value* NIfStatement::codeGen(CodeGenContext& context) {
+	Value* comp = condition.codeGen(context);
+	if (comp == nullptr) {
+		Node::printError("Code generation for compare operator of the conditional statement failed.");
+		context.addError();
+		return nullptr;
+	}
+	if (!comp->getType()->isIntegerTy(1)) {
+		Node::printError("If condition doesn't result in a boolean expression.");
+		context.addError();
 		return nullptr;
 	}
 
-	condValue = builder.CreateIntCast(
-        condValue, Type::getInt32Ty(MyContext), true);
+	Function*   function   = context.currentBlock()->getParent();
+	BasicBlock* thenBlock  = BasicBlock::Create(context.getGlobalContext(), "then", function);
+	BasicBlock* elseBlock  = BasicBlock::Create(context.getGlobalContext(), "else");
+	BasicBlock* mergeBlock = BasicBlock::Create(context.getGlobalContext(), "merge");
+	BranchInst::Create(thenBlock, elseBlock, comp, context.currentBlock());
 
-	Function* theFunction = context.currentBlock()->getParent();
-	BasicBlock *ifTrue = BasicBlock::Create(MyContext, "then", theFunction, 0);
-	BasicBlock *ifFalse = BasicBlock::Create(MyContext, "else");
-	BasicBlock *mergeBB = BasicBlock::Create(MyContext, "ifcont");
+	bool needMergeBlock = false;
 
-	Value *last = NULL;
-	if (elseBlock){
-		 BranchInst::Create(ifTrue, ifFalse, condValue, context.currentBlock() );
-	}else{
-		 BranchInst::Create(ifTrue, mergeBB, condValue, context.currentBlock() );
+	context.newScope(thenBlock, ScopeType::CodeBlock);
+	Value* thenValue = thenExpr->codeGen(context);
+	if (thenValue == nullptr) {
+		Node::printError("Missing else block of the conditional statement.");
+		context.addError();
+		return nullptr;
+	}
+	if (context.currentBlock()->getTerminator() == nullptr) {
+		BranchInst::Create(mergeBlock, context.currentBlock());
+		needMergeBlock = true;
 	}
 
-    builder.SetInsertPoint(ifTrue);
-	context.pushBlock(ifTrue);
-	last = block.codeGen(context);
-	last = BranchInst::Create(mergeBB, context.currentBlock());
-	context.popBlock();
+	function->getBasicBlockList().push_back(elseBlock);
+	context.endScope();
 
-	if (elseBlock){
-   		theFunction->getBasicBlockList().push_back(ifFalse);        //
-    	builder.SetInsertPoint(ifFalse);
-		context.pushBlock(ifFalse);
-		last = elseBlock->codeGen(context);
-		last = BranchInst::Create(mergeBB, context.currentBlock());
-		context.popBlock();
+	context.newScope(elseBlock);
+	Value* elseValue = nullptr;
+	if (elseExpr != nullptr) {
+		elseValue = elseExpr->codeGen(context);
 	}
 
-    theFunction->getBasicBlockList().push_back(mergeBB);        //
-    builder.SetInsertPoint(mergeBB);
-	ReturnInst::Create(MyContext, mergeBB); //for test
-	//context.pushBlock(mergeBB);
+	if (context.currentBlock()->getTerminator() == nullptr) {
+		BranchInst::Create(mergeBlock, context.currentBlock());
+		needMergeBlock = true;
+	}
+	context.endScope();
+	if (needMergeBlock) {
+		function->getBasicBlockList().push_back(mergeBlock);
+		context.setInsertPoint(mergeBlock);
+	}
 
-	return condValue;
+	return mergeBlock; // dummy return, for now
 }
-// {
-// 	std::cout << "Creating if statement" << endl;
-// 	Value *condValue = condition.codeGen(context);
-	// if (condValue == NULL) return NULL;
-	// condValue = new ICmpInst(*context.currentBlock(), ICmpInst::ICMP_NE, condValue, ConstantInt::get(Type::getInt64Ty(MyContext), 0, true), "ifcond");
-	// Function *function = context.currentBlock()->getParent();
-	// BasicBlock *thenBlock = BasicBlock::Create(MyContext, "then", function);
-	// BasicBlock *elseBlock = BasicBlock::Create(MyContext, "else");
-	// BasicBlock *mergeBlock = BasicBlock::Create(MyContext, "ifcont");
-	// BranchInst::Create(thenBlock, elseBlock, condValue, context.currentBlock());
-	// context.pushBlock(thenBlock);
-	// Value *thenValue = thenBlock->getTerminator();
-	// if (thenValue == NULL) {
-	// 	thenValue = thenBlock->getTerminator();
-	// }
-	// context.popBlock();
-	// if (thenValue == NULL) {
-	// 	thenValue = BranchInst::Create(mergeBlock, thenBlock);
-	// }
-	// function->getBasicBlockList().push_back(elseBlock);
-	// context.pushBlock(elseBlock);
-	// Value *elseValue = elseBlock->getTerminator();
-	// if (elseValue == NULL) {
-	// 	elseValue = elseBlock->getTerminator();
-	// }
-	// context.popBlock();
-	// if (elseValue == NULL) {
-	// 	elseValue = BranchInst::Create(mergeBlock, elseBlock);
-	// }
-	// function->getBasicBlockList().push_back(mergeBlock);
-	// context.pushBlock(mergeBlock);
-	// PHINode *phiNode = PHINode::Create(Type::getInt64Ty(MyContext), 2, "", mergeBlock);
-	// phiNode->addIncoming(thenValue, thenBlock);
-	// phiNode->addIncoming(elseValue, elseBlock);
-	//return condValue;
-//}
 
 Value* NLoopStatement::codeGen(CodeGenContext& context)
 {
