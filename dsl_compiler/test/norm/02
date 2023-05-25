@@ -1,9 +1,9 @@
 int a = 10
 int b = 9
 if(a > b) {
-  a = 70
+  int c = 70
 } else {
-  a = 2
+  int d = 2
 }
 
 a
