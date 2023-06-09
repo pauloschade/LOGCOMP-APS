@@ -155,14 +155,14 @@ public:
 };
 
 //create Loop statement
-class NLoopStatement : public NStatement {
-public:
-	NExpression& condition;
-	NBlock& block;
-	NLoopStatement(NExpression& condition, NBlock& block) : 
-		condition(condition), block(block) { }
-	virtual llvm::Value* codeGen(CodeGenContext& context);
-};
+// class NLoopStatement : public NStatement {
+// public:
+// 	NExpression& condition;
+// 	NBlock& block;
+// 	NLoopStatement(NExpression& condition, NBlock& block) : 
+// 		condition(condition), block(block) { }
+// 	virtual llvm::Value* codeGen(CodeGenContext& context);
+// };
 
 
 /////////////////////////////////////////////////// DSL /////////////////////////////////////////////////

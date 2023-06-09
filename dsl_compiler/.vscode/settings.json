@@ -16,6 +16,13 @@
     "string_view": "cpp",
     "unordered_map": "cpp",
     "*.tcc": "cpp",
-    "ostream": "cpp"
+    "ostream": "cpp",
+    "random": "cpp",
+    "array": "cpp",
+    "istream": "cpp",
+    "tuple": "cpp",
+    "utility": "cpp",
+    "deque": "cpp",
+    "vector": "cpp"
   }
 }

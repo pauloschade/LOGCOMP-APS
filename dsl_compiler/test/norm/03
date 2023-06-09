@@ -1,5 +1,7 @@
-int test() {
-    return 5
+int test(int c) {
+    int b = 10
+    return 5 + b + c
 }
 
-test()
+int a = test(100)
+a

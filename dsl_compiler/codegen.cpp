@@ -247,67 +247,66 @@ llvm::Value* NIfStatement::codeGen(CodeGenContext& context) {
 	cout << "Generating if statement" << endl;
 
 	Value* condValue = condition.codeGen(context);
+	
 	if (!condValue) {
 		std::cout<< "No condValue" <<std::endl;
 		return nullptr;
 	}
+	if (!condValue->getType()->isIntegerTy(1)) {
+	  std::cout << "condition doesnt return bool" << std::endl; 
+      return nullptr;
+    }
+
 
 	condValue = CastToBoolean(context, condValue);
 
 	Function* theFunction = context.currentBlock()->getParent();
-	BasicBlock *ifTrue = BasicBlock::Create(MyContext, "then", theFunction, 0);
-	BasicBlock *ifFalse = BasicBlock::Create(MyContext, "else");
-	BasicBlock *mergeBB = BasicBlock::Create(MyContext, "ifcont");
+	BasicBlock *ThenBB = BasicBlock::Create(MyContext, "then", theFunction);
+	BasicBlock *ElseBB = BasicBlock::Create(MyContext, "else");
+	BasicBlock *MergeBB = BasicBlock::Create(MyContext, "ifcont");
 
-	Value *last = NULL;
-	if (elseBlock){
-		 BranchInst::Create(ifTrue, ifFalse, condValue, context.currentBlock() );
-	}else{
-		 BranchInst::Create(ifTrue, mergeBB, condValue, context.currentBlock() );
+	Builder.CreateCondBr(condValue, ThenBB, ElseBB);
+
+	//THEN BLOCK
+	Builder.SetInsertPoint(ThenBB);
+	Value *ThenV = thenBlock.codeGen(context);
+	if (!ThenV)
+  		return nullptr;
+
+	Builder.CreateBr(MergeBB);
+
+	ThenBB = Builder.GetInsertBlock();
+
+	//ELSE BLOCK
+	theFunction->getBasicBlockList().push_back(ElseBB);
+
+	Builder.SetInsertPoint(ElseBB);
+
+	Value *ElseV = elseBlock->codeGen(context);
+	if (!ElseV)
+  		return nullptr;
+
+	Builder.CreateBr(MergeBB);
+	// codegen of 'Else' can change the current block, update ElseBB for the PHI.
+	ElseBB = Builder.GetInsertBlock();
+
+	theFunction->getBasicBlockList().push_back(MergeBB);
+  	Builder.SetInsertPoint(MergeBB);
+
+	Type* phiType = ThenV->getType();
+	if (phiType != ElseV->getType()) {
+		// Handle the case when the types don't match
+		// You can either convert the types or handle the error accordingly
+		// For example, if the types are not compatible, you can return nullptr or raise an error
+		std::cout << "Types of ThenV and ElseV don't match!" << std::endl;
+		return nullptr;
 	}
+	PHINode *PN = Builder.CreatePHI(Type::getInt64Ty(MyContext), 2, "iftmp");
 
-	//context.builder.SetInsertPoint(ifTrue);
-	context.pushBlock(ifTrue);
-	last = thenBlock.codeGen(context);
-	last = BranchInst::Create(mergeBB, context.currentBlock());
-	context.popBlock();
-	//std::cout<< ifTrue->getParent() << std::endl;
 
-	if (elseBlock){
-   		theFunction->getBasicBlockList().push_back(ifFalse);        //
-    	Builder.SetInsertPoint(ifFalse);
-		context.pushBlock(ifFalse);
-		last = elseBlock->codeGen(context);
-		last = BranchInst::Create(mergeBB, context.currentBlock());
-		context.popBlock();
-	}
-
-    theFunction->getBasicBlockList().push_back(mergeBB);        //
-    Builder.SetInsertPoint(mergeBB);
-	ReturnInst::Create(MyContext, mergeBB); //for test
-	//context.pushBlock(mergeBB);
-
-	return mergeBB;
-}
-
-Value* NLoopStatement::codeGen(CodeGenContext& context)
-{
-	std::cout << "Creating loop statement" << endl;
-	Function *function = context.currentBlock()->getParent();
-	BasicBlock *preheaderBlock = context.currentBlock();
-	BasicBlock *loopBlock = BasicBlock::Create(MyContext, "loop", function);
-	BasicBlock *afterBlock = BasicBlock::Create(MyContext, "afterloop", function);
-	Value *condValue = condition.codeGen(context);
-	if (condValue == NULL) return NULL;
-	condValue = new ICmpInst(*context.currentBlock(), ICmpInst::ICMP_NE, condValue, ConstantInt::get(Type::getInt64Ty(MyContext), 0, true), "loopcond");
-	BranchInst::Create(loopBlock, afterBlock, condValue, preheaderBlock);
-	context.pushBlock(loopBlock);
-	Value *bodyValue = block.codeGen(context);
-	if (bodyValue == NULL) return NULL;
-	BranchInst::Create(loopBlock, context.currentBlock());
-	context.popBlock();
-	context.pushBlock(afterBlock);
-	return Constant::getNullValue(Type::getInt64Ty(MyContext));
+	PN->addIncoming(ElseBB, ThenBB);
+	PN->addIncoming(ElseV, ElseBB);
+	return MergeBB;
 }
 
 //create print statement
