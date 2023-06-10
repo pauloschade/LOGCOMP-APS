@@ -1,0 +1,8 @@
+extern void printi(int val)
+
+int test(int c) {
+    return 0
+}
+
+int a = test(20)
+printi(a)

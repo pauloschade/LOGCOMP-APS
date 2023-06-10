@@ -1,0 +1,7 @@
+extern void printi(int val)
+int a = 2
+
+if(10 > 9) {
+    a = 20
+}
+printi(a)

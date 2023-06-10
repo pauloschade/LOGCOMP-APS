@@ -32,3 +32,5 @@ parser: $(OBJS)
 
 test: parser example.txt
 	cat example.txt | ./parser
+
+all: parser

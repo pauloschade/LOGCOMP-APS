@@ -131,26 +131,16 @@ public:
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
-///////////////////////////////////////////////////
-
-class NPrintStatement : public NStatement {
-public:
-	NExpression& expression;
-	NPrintStatement(NExpression& expression) : 
-		expression(expression) { }
-	virtual llvm::Value* codeGen(CodeGenContext& context);
-};
+//////////////////////////////////////////////////
 
 //create if statement
 class NIfStatement : public NStatement {
 public:
 	NExpression& condition;
-	NBlock& block;
-	NBlock *elseBlock;
-	NIfStatement(NExpression& condition, NBlock& block) : 
-		condition(condition), block(block) { elseBlock = NULL; }
-	NIfStatement(NExpression& condition, NBlock& block, NBlock *elseBlock) :
-		condition(condition), block(block), elseBlock(elseBlock) { }
+	NBlock& thenBlock;
+	NBlock& elseBlock;
+	NIfStatement(NExpression& condition, NBlock& block, NBlock& elseBlock) :
+		condition(condition), thenBlock(block), elseBlock(elseBlock) { }
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
@@ -163,6 +153,16 @@ public:
 		condition(condition), block(block) { }
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
+
+//create Loop statement
+// class NLoopStatement : public NStatement {
+// public:
+// 	NExpression& condition;
+// 	NBlock& block;
+// 	NLoopStatement(NExpression& condition, NBlock& block) : 
+// 		condition(condition), block(block) { }
+// 	virtual llvm::Value* codeGen(CodeGenContext& context);
+// };
 
 
 /////////////////////////////////////////////////// DSL /////////////////////////////////////////////////

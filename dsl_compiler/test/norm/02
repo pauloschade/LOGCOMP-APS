@@ -1,4 +1,6 @@
+extern void printi(int val)
+
 int a = 10
-if(9 < 10) {
-  a = a + 1
-}
+int b = 9
+int c = b != a
+printi(c)
