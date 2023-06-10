@@ -1,13 +1,8 @@
+extern void printi(int val)
+
 int test(int c) {
-    int b = 10
-    return 5 + b + c
+    return 0
 }
 
-int teste(int a, int b) {
-    int c = 2*a + b
-    int f = test(1)
-    return f
-}
-
-int a = teste(10, 10)
-a
+int a = test(20)
+printi(a)

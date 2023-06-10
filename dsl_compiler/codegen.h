@@ -40,7 +40,6 @@ class CodeGenContext {
 public:
 
     Module *module;
-    llvm::LLVMContext context;
     CodeGenContext() { module = new Module("main", MyContext); }
     
     void generateCode(NBlock& root);
@@ -60,11 +59,11 @@ public:
     }
     void setCurrentReturnValue(Value *value) { blocks.top()->returnValue = value; }
     Value* getCurrentReturnValue() { return blocks.top()->returnValue; }
-        void pushBlockGlobal(llvm::BasicBlock *block) {
-        auto *topBlock = new CodeGenBlock();
-        topBlock->block = block;
-        // Copy the locals from the current block to the new block
-        topBlock->locals = blocks.top()->locals;
-        blocks.push(topBlock);
+    void pushBlockGlobal(llvm::BasicBlock *block) {
+        auto prevBlock = blocks.top();
+        blocks.push(new CodeGenBlock());
+        blocks.top()->returnValue = NULL;
+        blocks.top()->block = block;
+        blocks.top()->locals = prevBlock -> locals;
     }
 };

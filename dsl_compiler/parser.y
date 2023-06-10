@@ -65,8 +65,8 @@ stmts : stmt { $$ = new NBlock(); $$->statements.push_back($<stmt>1); }
 stmt : var_decl | func_decl | extern_decl | dsl_stmt
 	 | expr { $$ = new NExpressionStatement(*$1); }
 	 | TRETURN expr { $$ = new NReturnStatement(*$2); }
-	 | TIF TLPAREN expr TRPAREN block { $$ = new NIfStatement(*$3, *$5); }
-	 | TIF TLPAREN expr TRPAREN block TELSE block { $$ = new NIfStatement(*$3, *$5, $7); }
+	 | TIF TLPAREN expr TRPAREN block { $$ = new NIfStatement(*$3, *$5, *(new NBlock())); }
+	 | TIF TLPAREN expr TRPAREN block TELSE block { $$ = new NIfStatement(*$3, *$5, *$7); }
      ;
 
 block : TLBRACE stmts TRBRACE { $$ = $2; }

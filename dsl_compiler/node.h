@@ -138,10 +138,8 @@ class NIfStatement : public NStatement {
 public:
 	NExpression& condition;
 	NBlock& thenBlock;
-	NBlock *elseBlock;
-	NIfStatement(NExpression& condition, NBlock& block) : 
-		condition(condition), thenBlock(block) { elseBlock = NULL; }
-	NIfStatement(NExpression& condition, NBlock& block, NBlock *elseBlock) :
+	NBlock& elseBlock;
+	NIfStatement(NExpression& condition, NBlock& block, NBlock& elseBlock) :
 		condition(condition), thenBlock(block), elseBlock(elseBlock) { }
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };

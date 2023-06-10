@@ -20,7 +20,7 @@ void CodeGenContext::generateCode(NBlock& root)
 	/* Push a new variable/block context */
 	pushBlock(bblock);
 	llvm::Value *mainRetVal = root.codeGen(*this); /* emit bytecode for the toplevel block */
-	ReturnInst::Create(MyContext, mainRetVal ,bblock);
+	ReturnInst::Create(MyContext, mainRetVal , this -> currentBlock());
 	popBlock();
 	
 	/* Print the bytecode in a human-readable format 
@@ -42,8 +42,8 @@ GenericValue CodeGenContext::runCode() {
 	ee->finalizeObject();
 	vector<GenericValue> noargs;
 	GenericValue v = ee->runFunction(mainFunction, noargs);
-	long long val = v.IntVal.getSExtValue();
-	std::cout << "Code was run.\n" << "res: " << val << std::endl;
+	// long long val = v.IntVal.getSExtValue();
+	// std::cout << "Code was run.\n" << "res: " << val << std::endl;
 	return v;
 }
 
@@ -243,7 +243,7 @@ Value* NFunctionDeclaration::codeGen(CodeGenContext& context)
 ////////////////////////////////////////////////////////////
 
 //create if statement
-Value* NIfStatement::codeGen(CodeGenContext &context) {
+llvm::Value *NIfStatement::codeGen(CodeGenContext &context) {
     llvm::Value *condV = condition.codeGen(context);
     if (!condV)
         return nullptr;
@@ -253,14 +253,19 @@ Value* NIfStatement::codeGen(CodeGenContext &context) {
 
     llvm::Function *currFunc = context.currentBlock()->getParent();
 
-    llvm::BasicBlock *thenBB = llvm::BasicBlock::Create(MyContext, "then", currFunc);
-    llvm::BasicBlock *elseBB = llvm::BasicBlock::Create(MyContext, "else");
-    llvm::BasicBlock *mergeBB = llvm::BasicBlock::Create(MyContext, "exitIf");
+    llvm::BasicBlock *thenBB =
+        llvm::BasicBlock::Create(MyContext, "then", currFunc);
+    llvm::BasicBlock *elseBB =
+        llvm::BasicBlock::Create(MyContext, "else");
+    llvm::BasicBlock *mergeBB =
+        llvm::BasicBlock::Create(MyContext, "exitIf");
 
     llvm::CmpInst::Predicate predNe = llvm::CmpInst::ICMP_NE;
-    llvm::Value *condInstr = llvm::ICmpInst::Create(llvm::Instruction::OtherOps::ICmp, predNe, condV, zero, "", context.currentBlock());
+    llvm::Value *condInstr =
+        llvm::ICmpInst::Create(llvm::Instruction::OtherOps::ICmp, predNe, condV,
+                               zero, "", context.currentBlock());
 
-    llvm::BranchInst::Create(thenBB, elseBB, condInstr, context.currentBlock());
+    llvm::BranchInst::Create(thenBB, mergeBB, condInstr, context.currentBlock());
     cout << "Created Branch Inst" << endl;
 
     // Set the current block to the "then" block
@@ -268,11 +273,8 @@ Value* NIfStatement::codeGen(CodeGenContext &context) {
 
     // Emit bytecode for "then" block
     llvm::Value *thenV = thenBlock.codeGen(context);
-    if (!thenV) {
-		context.popBlock();
-		std::cout << "null ptr" << std::endl;
+    if (!thenV)
         return nullptr;
-	}
 
     llvm::BranchInst::Create(mergeBB, thenBB);
 
@@ -285,12 +287,9 @@ Value* NIfStatement::codeGen(CodeGenContext &context) {
 
 
     // Emit bytecode for "else" block
-    llvm::Value *elseV = elseBlock -> codeGen(context);
-    if (!elseV) {
-		context.popBlock();
-		std::cout << "null ptr" << std::endl;
+    llvm::Value *elseV = elseBlock.codeGen(context);
+    if (!elseV)
         return nullptr;
-	}
 
     llvm::BranchInst::Create(mergeBB, elseBB);
     context.popBlock();
@@ -308,7 +307,7 @@ Value* NIfStatement::codeGen(CodeGenContext &context) {
 
     context.currentBlock()->getInstList().push_back(PN);
 
-    return mergeBB;
+    return PN;
 }
 
 /////////////////////////////////////////////////// DSL /////////////////////////////////////////////////
@@ -394,4 +393,3 @@ Value* NDSLTransferStatement::codeGen(CodeGenContext& context)
 
 	return expenderValue;
 }
-
