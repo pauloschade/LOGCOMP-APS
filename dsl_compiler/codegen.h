@@ -40,6 +40,7 @@ class CodeGenContext {
 public:
 
     Module *module;
+    llvm::LLVMContext context;
     CodeGenContext() { module = new Module("main", MyContext); }
     
     void generateCode(NBlock& root);
@@ -47,7 +48,23 @@ public:
     std::map<std::string, Value*>& locals() { return blocks.top()->locals; }
     BasicBlock *currentBlock() { return blocks.top()->block; }
     void pushBlock(BasicBlock *block) { blocks.push(new CodeGenBlock()); blocks.top()->returnValue = NULL; blocks.top()->block = block; }
-    void popBlock() { CodeGenBlock *top = blocks.top(); blocks.pop(); delete top; }
+    void popBlock() {
+        CodeGenBlock *top = blocks.top();
+        blocks.pop();
+        // Preserve the locals if there is a previous block
+        if (!blocks.empty()) {
+            CodeGenBlock *previous = blocks.top();
+            previous->locals = top->locals;
+        }
+        delete top;
+    }
     void setCurrentReturnValue(Value *value) { blocks.top()->returnValue = value; }
     Value* getCurrentReturnValue() { return blocks.top()->returnValue; }
+        void pushBlockGlobal(llvm::BasicBlock *block) {
+        auto *topBlock = new CodeGenBlock();
+        topBlock->block = block;
+        // Copy the locals from the current block to the new block
+        topBlock->locals = blocks.top()->locals;
+        blocks.push(topBlock);
+    }
 };

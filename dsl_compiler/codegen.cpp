@@ -144,7 +144,7 @@ math:
 	return BinaryOperator::Create(instr, lhs.codeGen(context), 
 		rhs.codeGen(context), "", context.currentBlock());
 compare:
-	return CmpInst::Create(*(new Instruction::OtherOps), com, lhs.codeGen(context), 
+	return CmpInst::Create(llvm::Instruction::OtherOps::ICmp, com, lhs.codeGen(context), 
 	rhs.codeGen(context), "", context.currentBlock());
 }
 
@@ -243,85 +243,72 @@ Value* NFunctionDeclaration::codeGen(CodeGenContext& context)
 ////////////////////////////////////////////////////////////
 
 //create if statement
-llvm::Value* NIfStatement::codeGen(CodeGenContext& context) {
-	cout << "Generating if statement" << endl;
+Value* NIfStatement::codeGen(CodeGenContext &context) {
+    llvm::Value *condV = condition.codeGen(context);
+    if (!condV)
+        return nullptr;
+    
+    llvm::Type *boolType = llvm::Type::getInt1Ty(MyContext);
+    llvm::Value *zero = llvm::ConstantInt::getFalse(boolType);
 
-	Value* condValue = condition.codeGen(context);
-	
-	if (!condValue) {
-		std::cout<< "No condValue" <<std::endl;
-		return nullptr;
+    llvm::Function *currFunc = context.currentBlock()->getParent();
+
+    llvm::BasicBlock *thenBB = llvm::BasicBlock::Create(MyContext, "then", currFunc);
+    llvm::BasicBlock *elseBB = llvm::BasicBlock::Create(MyContext, "else");
+    llvm::BasicBlock *mergeBB = llvm::BasicBlock::Create(MyContext, "exitIf");
+
+    llvm::CmpInst::Predicate predNe = llvm::CmpInst::ICMP_NE;
+    llvm::Value *condInstr = llvm::ICmpInst::Create(llvm::Instruction::OtherOps::ICmp, predNe, condV, zero, "", context.currentBlock());
+
+    llvm::BranchInst::Create(thenBB, elseBB, condInstr, context.currentBlock());
+    cout << "Created Branch Inst" << endl;
+
+    // Set the current block to the "then" block
+    context.pushBlockGlobal(thenBB);
+
+    // Emit bytecode for "then" block
+    llvm::Value *thenV = thenBlock.codeGen(context);
+    if (!thenV) {
+		context.popBlock();
+		std::cout << "null ptr" << std::endl;
+        return nullptr;
 	}
-	if (!condValue->getType()->isIntegerTy(1)) {
-	  std::cout << "condition doesnt return bool" << std::endl; 
-      return nullptr;
-    }
+
+    llvm::BranchInst::Create(mergeBB, thenBB);
+
+    context.popBlock();
+    cout << "Created Branch Then" << endl;
+
+    // Set the current block to the "else" block
+    currFunc->getBasicBlockList().push_back(elseBB);
+    context.pushBlockGlobal(elseBB);
 
 
-	condValue = CastToBoolean(context, condValue);
-
-	Function* theFunction = context.currentBlock()->getParent();
-	BasicBlock *ThenBB = BasicBlock::Create(MyContext, "then", theFunction);
-	BasicBlock *ElseBB = BasicBlock::Create(MyContext, "else");
-	BasicBlock *MergeBB = BasicBlock::Create(MyContext, "ifcont");
-
-	Builder.CreateCondBr(condValue, ThenBB, ElseBB);
-
-	//THEN BLOCK
-	Builder.SetInsertPoint(ThenBB);
-	Value *ThenV = thenBlock.codeGen(context);
-	if (!ThenV)
-  		return nullptr;
-
-	Builder.CreateBr(MergeBB);
-
-	ThenBB = Builder.GetInsertBlock();
-
-	//ELSE BLOCK
-	theFunction->getBasicBlockList().push_back(ElseBB);
-
-	Builder.SetInsertPoint(ElseBB);
-
-	Value *ElseV = elseBlock->codeGen(context);
-	if (!ElseV)
-  		return nullptr;
-
-	Builder.CreateBr(MergeBB);
-	// codegen of 'Else' can change the current block, update ElseBB for the PHI.
-	ElseBB = Builder.GetInsertBlock();
-
-	theFunction->getBasicBlockList().push_back(MergeBB);
-  	Builder.SetInsertPoint(MergeBB);
-
-	Type* phiType = ThenV->getType();
-	if (phiType != ElseV->getType()) {
-		// Handle the case when the types don't match
-		// You can either convert the types or handle the error accordingly
-		// For example, if the types are not compatible, you can return nullptr or raise an error
-		std::cout << "Types of ThenV and ElseV don't match!" << std::endl;
-		return nullptr;
+    // Emit bytecode for "else" block
+    llvm::Value *elseV = elseBlock -> codeGen(context);
+    if (!elseV) {
+		context.popBlock();
+		std::cout << "null ptr" << std::endl;
+        return nullptr;
 	}
-	PHINode *PN = Builder.CreatePHI(Type::getInt64Ty(MyContext), 2, "iftmp");
+
+    llvm::BranchInst::Create(mergeBB, elseBB);
+    context.popBlock();
+    cout << "Created Branch Else" << endl;
+
+    // Set the current block to the "merge" block
+    currFunc->getBasicBlockList().push_back(mergeBB);
+    context.pushBlockGlobal(mergeBB);
 
 
-	PN->addIncoming(ElseBB, ThenBB);
-	PN->addIncoming(ElseV, ElseBB);
-	return MergeBB;
-}
+    unsigned reservedValues = 2;
+    llvm::PHINode* PN = llvm::PHINode::Create(elseV->getType(), reservedValues, "");
+    PN->addIncoming(thenV, thenBB);
+    PN->addIncoming(elseV, elseBB);
 
-//create print statement
-Value* NPrintStatement::codeGen(CodeGenContext& context)
-{
-	std::cout << "Creating print statement" << endl;
-	Function *function = context.module->getFunction("printf");
-	if (function == NULL) {
-		return LogErrorV("no printf function found");
-	}
-	std::vector<Value*> args;
-	args.push_back(ConstantPointerNull::get(Type::getInt8PtrTy(MyContext)));
-	args.push_back(expression.codeGen(context));
-	CallInst *call = CallInst::Create(function, makeArrayRef(args), "", context.currentBlock());
-	return call;
+    context.currentBlock()->getInstList().push_back(PN);
+
+    return mergeBB;
 }
 
 /////////////////////////////////////////////////// DSL /////////////////////////////////////////////////

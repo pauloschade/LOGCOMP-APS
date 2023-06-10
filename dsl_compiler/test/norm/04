@@ -1,8 +1,9 @@
 int a = 2
 
 if(10 < 9) {
-    a = 5
+    int b = 5
 } else {
-    a = 3
+    int c = 3
 }
-a
+int d = 2
+d

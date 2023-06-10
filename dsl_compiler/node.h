@@ -131,15 +131,7 @@ public:
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
-///////////////////////////////////////////////////
-
-class NPrintStatement : public NStatement {
-public:
-	NExpression& expression;
-	NPrintStatement(NExpression& expression) : 
-		expression(expression) { }
-	virtual llvm::Value* codeGen(CodeGenContext& context);
-};
+//////////////////////////////////////////////////
 
 //create if statement
 class NIfStatement : public NStatement {

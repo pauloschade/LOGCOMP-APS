@@ -3,5 +3,11 @@ int test(int c) {
     return 5 + b + c
 }
 
-int a = test(100)
+int teste(int a, int b) {
+    int c = 2*a + b
+    int f = test(1)
+    return f
+}
+
+int a = teste(10, 10)
 a
