@@ -4,6 +4,9 @@ int abacate = 2
 loop(abacate < 10) {
     if(abacate < 10) {
         abacate = 100
+        if(abacate < 200) {
+            abacate = abacate + 1000
+        }
     }
     abacate = abacate + 1
 }

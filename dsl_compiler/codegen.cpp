@@ -275,7 +275,7 @@ llvm::Value *NIfStatement::codeGen(CodeGenContext &context) {
     if (!thenV)
         return nullptr;
 
-    llvm::BranchInst::Create(mergeBB, thenBB);
+    llvm::BranchInst::Create(mergeBB, context.currentBlock());
 
     context.popBlock();
     cout << "Created Branch Then" << endl;
@@ -321,7 +321,7 @@ Value* NLoopStatement::codeGen(CodeGenContext& context)
     if (!blockV)
         return nullptr;
 
-    llvm::BranchInst::Create(loopConditionBB, loopBodyBB);
+    llvm::BranchInst::Create(loopConditionBB, context.currentBlock());
     context.popBlock();
     std::cout << "Created Loop Block" << std::endl;
 	currFunc->getBasicBlockList().push_back(loopMergeBB);
