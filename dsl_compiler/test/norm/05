@@ -1,0 +1,7 @@
+extern void printi(int val)
+int abacate = 2
+
+loop(abacate < 10) {
+    abacate = abacate + 1
+}
+printi(abacate)

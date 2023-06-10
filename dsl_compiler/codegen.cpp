@@ -242,6 +242,7 @@ Value* NFunctionDeclaration::codeGen(CodeGenContext& context)
 
 ////////////////////////////////////////////////////////////
 
+
 //create if statement
 llvm::Value *NIfStatement::codeGen(CodeGenContext &context) {
     llvm::Value *condV = condition.codeGen(context);
@@ -255,15 +256,13 @@ llvm::Value *NIfStatement::codeGen(CodeGenContext &context) {
 
     llvm::BasicBlock *thenBB =
         llvm::BasicBlock::Create(MyContext, "then", currFunc);
-    llvm::BasicBlock *elseBB =
-        llvm::BasicBlock::Create(MyContext, "else");
+    // llvm::BasicBlock *elseBB =
+    //     llvm::BasicBlock::Create(MyContext, "else");
     llvm::BasicBlock *mergeBB =
         llvm::BasicBlock::Create(MyContext, "exitIf");
 
     llvm::CmpInst::Predicate predNe = llvm::CmpInst::ICMP_NE;
-    llvm::Value *condInstr =
-        llvm::ICmpInst::Create(llvm::Instruction::OtherOps::ICmp, predNe, condV,
-                               zero, "", context.currentBlock());
+    llvm::Value *condInstr = llvm::ICmpInst::Create(llvm::Instruction::OtherOps::ICmp, predNe, condV,zero, "", context.currentBlock());
 
     llvm::BranchInst::Create(thenBB, mergeBB, condInstr, context.currentBlock());
     cout << "Created Branch Inst" << endl;
@@ -280,35 +279,57 @@ llvm::Value *NIfStatement::codeGen(CodeGenContext &context) {
 
     context.popBlock();
     cout << "Created Branch Then" << endl;
-
-    // Set the current block to the "else" block
-    currFunc->getBasicBlockList().push_back(elseBB);
-    context.pushBlockGlobal(elseBB);
-
-
-    // Emit bytecode for "else" block
-    llvm::Value *elseV = elseBlock.codeGen(context);
-    if (!elseV)
-        return nullptr;
-
-    llvm::BranchInst::Create(mergeBB, elseBB);
-    context.popBlock();
-    cout << "Created Branch Else" << endl;
-
-    // Set the current block to the "merge" block
     currFunc->getBasicBlockList().push_back(mergeBB);
     context.pushBlockGlobal(mergeBB);
 
-
-    unsigned reservedValues = 2;
-    llvm::PHINode* PN = llvm::PHINode::Create(elseV->getType(), reservedValues, "");
-    PN->addIncoming(thenV, thenBB);
-    PN->addIncoming(elseV, elseBB);
-
-    context.currentBlock()->getInstList().push_back(PN);
-
-    return PN;
+    return condV;
 }
+
+Value* NLoopStatement::codeGen(CodeGenContext& context)
+{
+    llvm::Function* currFunc = context.currentBlock()->getParent();
+
+    llvm::BasicBlock* loopConditionBB = llvm::BasicBlock::Create(MyContext, "loopcondition", currFunc);
+    llvm::BasicBlock* loopBodyBB = llvm::BasicBlock::Create(MyContext, "loopbody");
+    llvm::BasicBlock* loopMergeBB = llvm::BasicBlock::Create(MyContext, "loopmerge");
+
+	llvm::BranchInst::Create(loopConditionBB, context.currentBlock());
+
+    context.pushBlockGlobal(loopConditionBB);
+
+    // Generate the condition value
+    llvm::Value* condV = condition.codeGen(context);
+    if (!condV)
+        return nullptr;
+
+    // Create the loop condition comparison instruction
+    llvm::Type* boolType = llvm::Type::getInt1Ty(MyContext);
+    llvm::Value* zero = llvm::ConstantInt::getFalse(boolType);
+    llvm::CmpInst::Predicate predNe = llvm::CmpInst::ICMP_NE;
+    llvm::Value* condInstr = llvm::ICmpInst::Create(llvm::Instruction::OtherOps::ICmp, predNe, condV, zero, "", context.currentBlock());
+
+    // Create a branch instruction to transfer control flow based on the loop condition
+    llvm::BranchInst::Create(loopBodyBB, loopMergeBB, condInstr, context.currentBlock());
+	context.popBlock();
+
+	// Set the current block to the "then" block
+	currFunc->getBasicBlockList().push_back(loopBodyBB);
+    context.pushBlockGlobal(loopBodyBB);
+
+    // Emit bytecode for "then" block
+    llvm::Value *blockV = block.codeGen(context);
+    if (!blockV)
+        return nullptr;
+
+    llvm::BranchInst::Create(loopConditionBB, loopBodyBB);
+    context.popBlock();
+    std::cout << "Created Loop Block" << std::endl;
+	currFunc->getBasicBlockList().push_back(loopMergeBB);
+    context.pushBlockGlobal(loopMergeBB);
+    std::cout << "Created Loop Merge" << std::endl;
+    return condV;
+}
+
 
 /////////////////////////////////////////////////// DSL /////////////////////////////////////////////////
 

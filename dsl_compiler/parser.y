@@ -67,6 +67,7 @@ stmt : var_decl | func_decl | extern_decl | dsl_stmt
 	 | TRETURN expr { $$ = new NReturnStatement(*$2); }
 	 | TIF TLPAREN expr TRPAREN block { $$ = new NIfStatement(*$3, *$5, *(new NBlock())); }
 	 | TIF TLPAREN expr TRPAREN block TELSE block { $$ = new NIfStatement(*$3, *$5, *$7); }
+	 | TLOOP TLPAREN expr TRPAREN block {$$ = new NLoopStatement(*$3, *$5);}
      ;
 
 block : TLBRACE stmts TRBRACE { $$ = $2; }
