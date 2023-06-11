@@ -233,7 +233,11 @@ Value* NFunctionDeclaration::codeGen(CodeGenContext& context)
 	}
 	
 	block.codeGen(context);
-	ReturnInst::Create(MyContext, context.getCurrentReturnValue(), bblock);
+	ReturnInst::Create(MyContext, context.getCurrentReturnValue(), context.currentBlock());
+
+	while(context.currentBlock() != bblock) {
+		context.popBlock();
+	}
 
 	context.popBlock();
 	std::cout << "Creating function: " << id.name << endl;
@@ -248,10 +252,7 @@ llvm::Value *NIfStatement::codeGen(CodeGenContext &context) {
     llvm::Value *condV = condition.codeGen(context);
     if (!condV)
         return nullptr;
-    
-    llvm::Type *boolType = llvm::Type::getInt1Ty(MyContext);
-    llvm::Value *zero = llvm::ConstantInt::getFalse(boolType);
-
+		
     llvm::Function *currFunc = context.currentBlock()->getParent();
 
     llvm::BasicBlock *thenBB =
@@ -259,10 +260,9 @@ llvm::Value *NIfStatement::codeGen(CodeGenContext &context) {
     // llvm::BasicBlock *elseBB =
     //     llvm::BasicBlock::Create(MyContext, "else");
     llvm::BasicBlock *mergeBB =
-        llvm::BasicBlock::Create(MyContext, "exitIf");
+        llvm::BasicBlock::Create(MyContext, "ifmerge");
 
-    llvm::CmpInst::Predicate predNe = llvm::CmpInst::ICMP_NE;
-    llvm::Value *condInstr = llvm::ICmpInst::Create(llvm::Instruction::OtherOps::ICmp, predNe, condV,zero, "", context.currentBlock());
+    llvm::Value *condInstr = llvm::ICmpInst::Create(llvm::Instruction::OtherOps::ICmp, llvm::CmpInst::ICMP_NE, condV,llvm::ConstantInt::getFalse(llvm::Type::getInt1Ty(MyContext)), "", context.currentBlock());
 
     llvm::BranchInst::Create(thenBB, mergeBB, condInstr, context.currentBlock());
     cout << "Created Branch Inst" << endl;
