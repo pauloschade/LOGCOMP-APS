@@ -22,3 +22,9 @@ withdraw _bob 50;
 balance _bob; -> 100
 balance _alice; -> 250
 ```
+
+## References
+
+* https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/
+* https://gnuu.org/2009/09/18/writing-your-own-toy-compiler/
+* https://raywang.tech/2017/03/07/Flex-and-Bison-for-a-simple-language-MITScript/
