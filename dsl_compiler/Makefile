@@ -30,7 +30,4 @@ tokens.cpp: tokens.l parser.hpp
 parser: $(OBJS)
 	clang++  -gfull -o $@ $(OBJS) $(LIBS) $(LDFLAGS)
 
-test: parser example.txt
-	cat example.txt | ./parser
-
 all: parser
