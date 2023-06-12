@@ -12,17 +12,17 @@
 
 **LOOP** = `loop` , EXPRESSION , `{` , { STATEMENT } , `}` ;
 
-**IF** = `if` , EXPRESSION , `{` , { STATEMENT } , `}` , [ `else` , `{` , { STATEMENT } , `}` ] ;
+**IF** = `if` , EXPRESSION , `{` , { STATEMENT } , `}`
 
-**FUNCTION** = `function` , IDENTIFIER , `(` , [ PARAMETER_LIST ] , `)` , `{` , { STATEMENT } , `}` ;
+**FUNCTION** = `int` , IDENTIFIER , `(` , [ PARAMETER_LIST ] , `)` , `{` , { STATEMENT } , `}` ;
 
 **PARAMETER_LIST** = FUNC_PARAMETER , { `,` ,   FUNC_PARAMETER } ;
 
-**FUNC_PARAMETER** =  ( IDENTIFIER | PERSON_IDENTIFIER | NUMBER ) ;
+**FUNC_PARAMETER** =  ( INTEGER ) ;
 
 ------------------------------
 
-**DSL_STATEMENT** = DEPOSIT | WITHDRAW | TRANSFER | BALANCE | CREATE | DELETE ;
+**DSL_STATEMENT** = DEPOSIT | WITHDRAW | TRANSFER | CREATE | DELETE ;
 
 **CREATE** = `create` , PERSON_IDENTIFIER , INTEGER ;
 
@@ -34,15 +34,13 @@
 
 **TRANSFER** = `transfer`, PERSON_IDENTIFIER , PERSON_IDENTIFIER , INTEGER ;
 
-**BALANCE** = `balance` , PERSON_IDENTIFIER ;
-
 ------------------------------
 
 **EXPRESSION** = TERM, { (`+` | `-`), TERM } ;
 
 **TERM** = FACTOR, { (`*` | `/`), FACTOR } ;
 
-**FACTOR** = ((`+` | `-`), FACTOR) | NUMBER | `(`, EXPRESSION, `)` | IDENTIFIER | FUNCTION_CALL ;
+**FACTOR** = ((`+` | `-`), FACTOR) | INTEGER | `(`, EXPRESSION, `)` | IDENTIFIER | FUNCTION_CALL ;
 
 **FUNCTION_CALL** = IDENTIFIER , `(` , [ ARGUMENT_LIST ] , `)` ;
 
