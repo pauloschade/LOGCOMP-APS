@@ -25,6 +25,7 @@
 "to"                    return TOKEN(TTO);
 "then"                  return TOKEN(TTHEN);
 "end"                  return TOKEN(TEND);
+"function"                  return TOKEN(TFUNC);
 [a-zA-Z][a-zA-Z0-9_]*   SAVE_TOKEN; return TIDENTIFIER;
 [0-9]+					        SAVE_TOKEN; return TINTEGER;
 

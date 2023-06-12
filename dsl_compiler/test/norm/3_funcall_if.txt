@@ -1,6 +1,6 @@
 extern void printi(int val)
 
-int test(int c) {
+function int test(int c) {
     int c = 0
     if(10 > 9) {
         c = 10

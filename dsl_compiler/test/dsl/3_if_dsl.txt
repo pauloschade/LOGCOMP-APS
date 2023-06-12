@@ -1,5 +1,5 @@
 extern void printi(int val)
-int has_balance(int ident, int bal) {
+function int has_balance(int ident, int bal) {
     int ret = 0
     if(ident >= bal) {
         ret = 1

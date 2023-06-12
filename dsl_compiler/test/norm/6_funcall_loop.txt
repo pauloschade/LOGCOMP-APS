@@ -1,6 +1,6 @@
 extern void printi(int val)
 
-int test(int c) {
+function int test(int c) {
     int b = 0
     loop(c < 10) {
         b = b + 10
