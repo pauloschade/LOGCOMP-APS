@@ -1,0 +1,3 @@
+extern void printi(int val)
+create _paulo (10 + 10 + 20 * 2)
+printi(paulo)

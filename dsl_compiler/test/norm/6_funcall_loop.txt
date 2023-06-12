@@ -1,0 +1,16 @@
+extern void printi(int val)
+
+int test(int c) {
+    int b = 0
+    loop(c < 10) {
+        b = b + 10
+        c = c + 1
+    }
+    return b
+}
+
+int a = test(1)
+printi(a)
+
+int b = test(100)
+printi(b)

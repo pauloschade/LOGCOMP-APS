@@ -1,0 +1,26 @@
+extern void printi(int val)
+
+int test(int c, int h) {
+    if(c > h) {
+        loop(c > h + 10) {
+            h = h + 1
+        }
+    }
+    if(c == h) {
+        h = 1000/2
+        int j = c/2
+        if(j == 0) {
+            h = 325
+        }
+    }
+    return h
+}
+
+int a = test(10000, 1)
+printi(a)
+
+int b = test(1, 1)
+printi(b)
+
+int b = test(5, 5)
+printi(b)

@@ -257,8 +257,6 @@ llvm::Value *NIfStatement::codeGen(CodeGenContext &context) {
 
     llvm::BasicBlock *thenBB =
         llvm::BasicBlock::Create(MyContext, "then", currFunc);
-    // llvm::BasicBlock *elseBB =
-    //     llvm::BasicBlock::Create(MyContext, "else");
     llvm::BasicBlock *mergeBB =
         llvm::BasicBlock::Create(MyContext, "ifmerge");
 

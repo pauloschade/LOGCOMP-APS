@@ -1,0 +1,5 @@
+extern void printi(int val)
+int a = 10
+int b = a + 20
+
+printi(b)

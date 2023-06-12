@@ -1,5 +1,7 @@
+extern void printi(int val)
 create _paulo (10 + 10 + 20 * 2)
 create _mat 100
 deposit _mat 5*2
 withdraw _paulo 10*2
-paulo
+printi(paulo)
+printi(mat)

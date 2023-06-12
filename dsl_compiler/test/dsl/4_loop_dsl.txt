@@ -1,0 +1,24 @@
+extern void printi(int val)
+int has_balance(int ident, int bal) {
+    int ret = 0
+    if(ident >= bal) {
+        ret = 1
+    }
+    return ret
+}
+
+int a = 7
+int b = a * 10
+
+create _paulo (b * 2)
+create _mat (a)
+
+int bal_paulo = has_balance(paulo, b)
+
+loop(bal_paulo == 1) {
+    transfer _paulo to _mat (b/4)
+    bal_paulo = has_balance(paulo, b)
+}
+
+printi(paulo)
+printi(mat)
