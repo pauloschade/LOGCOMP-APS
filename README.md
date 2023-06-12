@@ -11,15 +11,15 @@ It's important to note that EZFIN DSL prioritizes precise balance calculations d
 ## Example
 
 ```
-create _bob 100;
-create _alice 100;
+create _bob 100
+create _alice 100
 
-deposit _bob 100;
-deposit _alice 100;
+deposit _bob 100
+deposit _alice 100
 
-transfer _bob to _alice 50;
+transfer _bob to _alice 50
 
-withdraw _bob 50;
+withdraw _bob 50
 ```
 
 * more examples are on the `dsl_compiler/test` directory
