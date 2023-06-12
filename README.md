@@ -35,4 +35,5 @@ withdraw _bob 50;
 
 * https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/
 * https://gnuu.org/2009/09/18/writing-your-own-toy-compiler/
-* https://raywang.tech/2017/03/07/Flex-and-Bison-for-a-simple-language-MITScript/
+* https://www.cs.cmu.edu/afs/cs/academic/class/15745-s16/www/lectures/L2-LLVM1.pdf
+* https://www.cs.cmu.edu/afs/cs/academic/class/15745-s16/www/lectures/L3-LLVM2.pdf
