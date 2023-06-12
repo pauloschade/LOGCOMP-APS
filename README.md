@@ -2,9 +2,11 @@
 
 ## Motivation
 
-EZFIN DSL is a powerful domain-specific language designed specifically for financial modeling. With EZFIN DSL, you can effortlessly track people's balances and expenses. Whether you need to create, delete, deposit, withdraw, transfer, or check balances, EZFIN DSL makes it easy to manage your financial data with confidence. Whether you are a financial professional or just starting out, EZFIN DSL is designed to be straightforward and user-friendly, without sacrificing functionality.
+Introducing EZFIN DSL, the ultimate domain-specific language crafted exclusively for financial modeling. With EZFIN DSL, effortlessly track balances and expenses with utmost precision. Whether you're handling tasks like creating, deleting, depositing, withdrawing, transferring, or checking balances, EZFIN DSL empowers you to manage your financial data with confidence. Tailored for both financial professionals and beginners, EZFIN DSL ensures a seamless and user-friendly experience while delivering powerful functionality.
 
-In addition to its core features, EZFIN DSL also boasts a Turing-complete programming language that enables users to create complex functions and loops. With this powerful tool at your disposal, you can create sophisticated financial models with ease, without sacrificing safety or reliability.
+In addition to its core features, EZFIN DSL offers a Turing-complete programming language that enables users to create intricate functions and loops. Harnessing this robust tool, you can effortlessly build sophisticated financial models while maintaining safety and reliability.
+
+It's important to note that EZFIN DSL prioritizes precise balance calculations due to its finance-oriented nature. Therefore, floating points are not supported, and only integers can be used when working with numbers.
 
 ## Example
 
@@ -15,13 +17,19 @@ create _alice 100;
 deposit _bob 100;
 deposit _alice 100;
 
-transfer _bob _alice 50;
+transfer _bob to _alice 50;
 
 withdraw _bob 50;
-
-balance _bob; -> 100
-balance _alice; -> 250
 ```
+
+* more examples are on the `dsl_compiler/test` directory
+
+## How to run
+
+* Go into the the `dsl_compiler` directory
+* run `make`
+* run `./parser < <filename>`
+* Make sure that you have llvm installed on your machine, and that the instalation path matches the one in the `codegen.h` file. If not, update the path in the `codegen.h` file to match your llvm installation path.
 
 ## References
 

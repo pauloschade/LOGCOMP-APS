@@ -6,9 +6,9 @@
 
 ------------------------------
 
-**REG_STATEMENT** = DECLARATION | ASSIGNMENT | LOOP | IF | FUNCTION | RETURN ;
+**REG_STATEMENT** = DECLARATION | ASSIGNMENT | LOOP | IF | FUNCTION_DEC | FUNCTION_CALL | RETURN ;
 
-**DECLARATION** = `int` , IDENTIFIER {, `=` , EXPRESSION };
+**DECLARATION** = TYPE , IDENTIFIER {, `=` , EXPRESSION };
 
 **ASSIGNMENT** = IDENTIFIER , `=` , EXPRESSION ;
 
@@ -16,11 +16,9 @@
 
 **IF** = `if` , EXPRESSION , `{` , { STATEMENT } , `}`
 
-**FUNCTION** = `int` , IDENTIFIER , `(` , [ PARAMETER_LIST ] , `)` , `{` , { STATEMENT } , `}` ;
+**FUNCTION_DEC** = TYPE , IDENTIFIER , `(` , [ DEC_PARAMS ] , `)` , `{` , { STATEMENT } , `}` ;
 
-**PARAMETER_LIST** = FUNC_PARAMETER , { `,` ,   FUNC_PARAMETER } ;
-
-**FUNC_PARAMETER** =  ( INTEGER ) ;
+**FUNCTION_CALL** = IDENTIFIER , `(` , [ ARGUMENT_LIST ] , `)` ;
 
 **RETURN** = `return` , EXPRESSION ;
 
@@ -51,6 +49,14 @@
 **ARGUMENT_LIST** = EXPRESSION , { `,` , EXPRESSION } ;
 
 ------------------------------
+
+**TYPE** = `int` ;
+
+**ARGUMENT_LIST** = FUNC_PARAMETER , { `,` ,   FUNC_PARAMETER } ;
+
+**FUNC_PARAMETER** =  ( EXPRESSION ) ;
+
+**DEC_PARAMS** = TYPE , IDENTIFIER, { `,` , TYPE , IDENTIFIER } ;
 
 **PERSON_IDENTIFIER** = `_` , IDENTIFIER ;
 
