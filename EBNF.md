@@ -6,7 +6,9 @@
 
 ------------------------------
 
-**REG_STATEMENT** = ASSIGNMENT | LOOP | IF | FUNCTION ;
+**REG_STATEMENT** = DECLARATION | ASSIGNMENT | LOOP | IF | FUNCTION | RETURN ;
+
+**DECLARATION** = `int` , IDENTIFIER {, `=` , EXPRESSION };
 
 **ASSIGNMENT** = IDENTIFIER , `=` , EXPRESSION ;
 
@@ -20,19 +22,21 @@
 
 **FUNC_PARAMETER** =  ( INTEGER ) ;
 
+**RETURN** = `return` , EXPRESSION ;
+
 ------------------------------
 
 **DSL_STATEMENT** = DEPOSIT | WITHDRAW | TRANSFER | CREATE | DELETE ;
 
-**CREATE** = `create` , PERSON_IDENTIFIER , INTEGER ;
+**CREATE** = `create` , PERSON_IDENTIFIER , EXPRESSION ;
 
 **DELETE** = `delete` , PERSON_IDENTIFIER ;
 
-**DEPOSIT** = `deposit` , PERSON_IDENTIFIER , INTEGER ;
+**DEPOSIT** = `deposit` , PERSON_IDENTIFIER , EXPRESSION ;
 
-**WITHDRAW** = `withdraw` , PERSON_IDENTIFIER , INTEGER ;
+**WITHDRAW** = `withdraw` , PERSON_IDENTIFIER , EXPRESSION ;
 
-**TRANSFER** = `transfer`, PERSON_IDENTIFIER , PERSON_IDENTIFIER , INTEGER ;
+**TRANSFER** = `transfer`, PERSON_IDENTIFIER , `to` ,PERSON_IDENTIFIER , EXPRESSION ;
 
 ------------------------------
 
