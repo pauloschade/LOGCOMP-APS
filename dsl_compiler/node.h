@@ -30,13 +30,6 @@ public:
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
-class NDouble : public NExpression {
-public:
-	double value;
-	NDouble(double value) : value(value) { }
-	virtual llvm::Value* codeGen(CodeGenContext& context);
-};
-
 class NIdentifier : public NExpression {
 public:
 	std::string name;
@@ -138,9 +131,8 @@ class NIfStatement : public NStatement {
 public:
 	NExpression& condition;
 	NBlock& thenBlock;
-	NBlock& elseBlock;
-	NIfStatement(NExpression& condition, NBlock& block, NBlock& elseBlock) :
-		condition(condition), thenBlock(block), elseBlock(elseBlock) { }
+	NIfStatement(NExpression& condition, NBlock& block) :
+		condition(condition), thenBlock(block) { }
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 

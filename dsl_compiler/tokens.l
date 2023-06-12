@@ -21,7 +21,6 @@
 "withdraw"              return TOKEN(TWITHDRAW);
 "balance"               return TOKEN(TBALANCE);
 "if"                    return TOKEN(TIF);
-"else"                  return TOKEN(TELSE);
 "loop"                  return TOKEN(TLOOP);
 "to"                    return TOKEN(TTO);
 "then"                  return TOKEN(TTHEN);

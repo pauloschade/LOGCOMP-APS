@@ -27,10 +27,8 @@ void CodeGenContext::generateCode(NBlock& root)
 	   to see if our program compiled properly
 	 */
 	std::cout << "Code is generated.\n";
-	// module->dump();
 
 	legacy::PassManager pm;
-	// TODO:
 	pm.add(createPrintModulePass(outs()));
 	pm.run(*module);
 }
@@ -42,8 +40,6 @@ GenericValue CodeGenContext::runCode() {
 	ee->finalizeObject();
 	vector<GenericValue> noargs;
 	GenericValue v = ee->runFunction(mainFunction, noargs);
-	// long long val = v.IntVal.getSExtValue();
-	// std::cout << "Code was run.\n" << "res: " << val << std::endl;
 	return v;
 }
 
@@ -52,9 +48,6 @@ static Type *typeOf(const NIdentifier& type)
 {
 	if (type.name.compare("int") == 0) {
 		return Type::getInt64Ty(MyContext);
-	}
-	else if (type.name.compare("double") == 0) {
-		return Type::getDoubleTy(MyContext);
 	}
 	return Type::getVoidTy(MyContext);
 }
@@ -82,12 +75,6 @@ Value* NInteger::codeGen(CodeGenContext& context)
 {
 	std::cout << "Creating integer: " << value << endl;
 	return ConstantInt::get(Type::getInt64Ty(MyContext), value, true);
-}
-
-Value* NDouble::codeGen(CodeGenContext& context)
-{
-	std::cout << "Creating double: " << value << endl;
-	return ConstantFP::get(Type::getDoubleTy(MyContext), value);
 }
 
 Value* NIdentifier::codeGen(CodeGenContext& context)
@@ -263,7 +250,6 @@ llvm::Value *NIfStatement::codeGen(CodeGenContext &context) {
     llvm::Value *condInstr = llvm::ICmpInst::Create(llvm::Instruction::OtherOps::ICmp, llvm::CmpInst::ICMP_NE, condV,llvm::ConstantInt::getFalse(llvm::Type::getInt1Ty(MyContext)), "", context.currentBlock());
 
     llvm::BranchInst::Create(thenBB, mergeBB, condInstr, context.currentBlock());
-    cout << "Created Branch Inst" << endl;
 
     // Set the current block to the "then" block
     context.pushBlockGlobal(thenBB);
@@ -310,11 +296,9 @@ Value* NLoopStatement::codeGen(CodeGenContext& context)
     llvm::BranchInst::Create(loopBodyBB, loopMergeBB, condInstr, context.currentBlock());
 	context.popBlock();
 
-	// Set the current block to the "then" block
 	currFunc->getBasicBlockList().push_back(loopBodyBB);
     context.pushBlockGlobal(loopBodyBB);
 
-    // Emit bytecode for "then" block
     llvm::Value *blockV = block.codeGen(context);
     if (!blockV)
         return nullptr;

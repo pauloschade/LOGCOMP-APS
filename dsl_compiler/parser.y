@@ -65,8 +65,7 @@ stmts : stmt { $$ = new NBlock(); $$->statements.push_back($<stmt>1); }
 stmt : var_decl | func_decl | extern_decl | dsl_stmt
 	 | expr { $$ = new NExpressionStatement(*$1); }
 	 | TRETURN expr { $$ = new NReturnStatement(*$2); }
-	 | TIF TLPAREN expr TRPAREN block { $$ = new NIfStatement(*$3, *$5, *(new NBlock())); }
-	 | TIF TLPAREN expr TRPAREN block TELSE block { $$ = new NIfStatement(*$3, *$5, *$7); }
+	 | TIF TLPAREN expr TRPAREN block { $$ = new NIfStatement(*$3, *$5); }
 	 | TLOOP TLPAREN expr TRPAREN block {$$ = new NLoopStatement(*$3, *$5);}
      ;
 
@@ -95,7 +94,6 @@ ident : TIDENTIFIER { $$ = new NIdentifier(*$1); delete $1; }
 	  ;
 
 numeric : TINTEGER { $$ = new NInteger(atol($1->c_str())); delete $1; }
-		| TDOUBLE { $$ = new NDouble(atof($1->c_str())); delete $1; }
 		;
 	
 expr : ident TEQUAL expr { $$ = new NAssignment(*$<ident>1, *$3); }
